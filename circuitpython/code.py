@@ -4,10 +4,9 @@ Gregory Brooks 2021
 
 import time
 
-# from adafruit_magtag.magtag import MagTag
 import alarm
 import board
-from adafruit_magtag.magtag import MagTag
+import rtc
 
 from octopusenergy import OctopusEnergy
 from openweather import OpenWeather
@@ -35,6 +34,9 @@ def run(instance, illuminate):
 
 def run_open_weather_map(illuminate=False):
     open_weather_map = OpenWeather()
+    open_weather_map.network.get_local_time()
+    now = rtc.RTC().datetime
+    open_weather_map.set_time(now)
     run(open_weather_map, illuminate)
 
 def run_octopus_energy(illuminate=False):

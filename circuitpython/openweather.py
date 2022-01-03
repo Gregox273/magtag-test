@@ -58,10 +58,21 @@ class OpenWeather(MagTag):
         # Wind Direction
         self.add_text(
             text_position=(10, 90),
-            text_transform=lambda x: "Wind Direction: {}deg".format(x),
+            text_transform=lambda x: "Wind Dir: {}deg".format(x),
         )
         # Cloudiness
         self.add_text(
             text_position=(10, 105),
             text_transform=lambda x: "Cloud: {}%".format(x),
         )
+        # Time
+        self.add_text(
+            text_position=(230,105),
+            line_spacing=0.75,
+            is_data=False
+        )
+
+    def set_time(self, now):
+        time = f"{now.tm_year}/{now.tm_mon}/{now.tm_mday}\n"\
+            + f"{now.tm_hour}:{now.tm_min:02}"
+        self.set_text(f"Updated:\n{time}", 7, False)
