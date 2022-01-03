@@ -2,17 +2,22 @@
 Gregory Brooks 2021
 """
 
+import time
+
 # from adafruit_magtag.magtag import MagTag
 import alarm
 import board
-import time
+from adafruit_magtag.magtag import MagTag
 
 from octopusenergy import OctopusEnergy
 from openweather import OpenWeather
 
 PERIOD_MINUTES = 15
+ILLUMINATE_THRESHOLD = 600
+ILLUMINATE_COLOUR = (255, 255, 255)
+ILLUMINATE_PERIOD_S = 5
 
-def run(instance):
+def run(instance, illuminate):
     instance.network.connect()
 
     try:
@@ -20,13 +25,21 @@ def run(instance):
     except (ValueError, RuntimeError) as e:
         print(e)
 
-def run_open_weather_map():
-    open_weather_map = OpenWeather()
-    run(open_weather_map)
+    if illuminate:
+        # Illuminate if it is dark
+        instance.peripherals.neopixel_disable = False
+        if instance.peripherals.light < ILLUMINATE_THRESHOLD:
+            instance.peripherals.neopixels.fill(ILLUMINATE_COLOUR)
+            time.sleep(ILLUMINATE_PERIOD_S)
+        instance.peripherals.neopixel_disable = True
 
-def run_octopus_energy():
+def run_open_weather_map(illuminate=False):
+    open_weather_map = OpenWeather()
+    run(open_weather_map, illuminate)
+
+def run_octopus_energy(illuminate=False):
     octopus_energy = OctopusEnergy()
-    run(octopus_energy)
+    run(octopus_energy, illuminate)
 
 def main():
     wake_alarm = alarm.wake_alarm
@@ -35,10 +48,11 @@ def main():
         for pin in buttons]
 
     if hasattr(wake_alarm, "pin"):
+        # If woken by pin alarm
         if wake_alarm.pin == board.BUTTON_B:
-            run_octopus_energy()
+            run_octopus_energy(illuminate=True)
         else:
-            run_open_weather_map()
+            run_open_weather_map(illuminate=True)
     else:
         run_open_weather_map()
 
