@@ -14,6 +14,7 @@ DATA_SOURCE = "https://api.openweathermap.org/data/2.5/weather?"\
 
 DATA_LOCATIONS = (
     ["weather", 0, "icon"],
+    ["main", "feels_like"],
     ["main", "temp"],
     ["main", "pressure"],
     ["main", "humidity"],
@@ -31,14 +32,21 @@ class OpenWeather(MagTag):
 
         # Weather Icon
         self.add_text(
-            text_position=(10, 15),
+            text_position=(200, 30),
             text_transform=lambda x: "Icon: {}".format(x),
         )
-        # Temperature
+        # Feels Like
         self.add_text(
             text_position=(10, 30),
             text_transform=\
-                lambda x: "Temperature: {}C".format(x-KELVIN_CELSIUS),
+                lambda x: "Feels Like: {}C".format(round(x-KELVIN_CELSIUS, 1)),
+        )
+        # Temperature
+        self.add_text(
+            text_position=(160, 70),
+            text_scale=2,
+            text_transform=\
+                lambda x: "Temp: {}C".format(round(x-KELVIN_CELSIUS,1)),
         )
         # Pressure
         self.add_text(
@@ -75,4 +83,4 @@ class OpenWeather(MagTag):
     def set_time(self, now):
         time = f"{now.tm_year}/{now.tm_mon}/{now.tm_mday}\n"\
             + f"{now.tm_hour}:{now.tm_min:02}"
-        self.set_text(f"Updated:\n{time}", 7, False)
+        self.set_text(f"Updated:\n{time}", 8, False)
